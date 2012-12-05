@@ -223,6 +223,9 @@ var Simplify = function()
 	//You should provide 'author', 'album', 'title', 'length' and 'uri' of track
 	//All attributes except uri are mandatory
 	//The track length must be provided in seconds
+	//You can also provide server with useful information regarding features of current player
+	//Supply 'features' dictionary with property 'disable_track_seeking' to disable track seeking,
+	//'disable_previous_track' to disable previous track, 'disable_next_track' to disable next track
 	this.setCurrentTrack = function(track)
 	{
 		internal_send(Simplify.MESSAGE_CHANGE_TRACK, track);

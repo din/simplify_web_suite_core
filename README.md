@@ -65,6 +65,22 @@ Sends information about current track to server. This method should be called wh
 }
 ```
 
+Sometimes you also may need to tell server that current player doesn't support some features, like seeking tracks or selecting previous track. You can send this useful information by appending `features` key to the aforementioned dictionary:
+
+```
+{
+   "author" : track_author,
+   "title"  : track_title,
+   "album"  : track_album,
+   "length" : track_length,
+   "features" : {
+   	"disable_track_seeking" : true, 		//Disables seeking of current track
+   	"disable_previous_track" : true,		//Disables selection of previous track
+   	"disable_next_track" : true 			//Disables selection of next track
+	}
+}
+```
+
 You do not need to cache any information about track. The core class caches everything if necessary.
 
 ### setCurrentArtwork(uri)

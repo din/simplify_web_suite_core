@@ -23,7 +23,8 @@ if (window.top == window)
 			var track = {"author" : $.trim( $("#playerBar:first a.playerBarArtist:first").text() ),
 					  		 "title"  : $.trim( $("#playerBar:first a.playerBarSong:first").text() ),
 					  		 "album"  : $.trim( $("#playerBar:first a.playerBarAlbum:first").text() ),
-					  		 "length" : trackLength};
+					  		 "length" : trackLength,
+					  		 "features" : {"disable_track_seeking" : true, "disable_previous_track" : true}};
 
 			track["id"] = track["author"] + track["title"] + track["album"];
 
@@ -51,6 +52,11 @@ if (window.top == window)
 			{
 				simplify.setCurrentTrack(track);
 				simplify.setCurrentArtwork();
+	
+				if ($(".playButton").is(":visible") == true)
+				{
+					simplify.setPlaybackPaused();
+				}
 
 				window.lastTrackId = track["id"];
 			}
