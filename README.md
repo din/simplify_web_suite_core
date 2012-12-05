@@ -8,7 +8,7 @@ See also [simplify_web_suite](http://github.com/mmth/simplify_web_suite) reposit
 
 The core class is a set of methods and properties to interact with desktop application (server). It implements basic client-server protocol on top of WebSockets connection. The connection itself is created and maintained by `Simplify` class. It also automatically reconnects if connection to server fails. 
 
-Core API provides you with two types of methods. You can send various messages to server to notify it about some important event on client side. On the other hand, server can also send various message to client, so Core API allows you to subscribe to incoming events to handle them appropriately. 
+Core API provides you with two types of methods. You can send various messages to server to notify it about some important event on client side. On the other hand, server can also send various messages to client, so Core API allows you to subscribe to incoming events to handle them appropriately. 
 
 Note that you are not supposed to cache any data, like player name, track information, or artwork links. All cache is stored inside the core class. If WebSockets connection to server eventually fails, the client will restore everything when connection becomes available.  
 
