@@ -2,7 +2,7 @@
 //Created by Semibold Mammoth in 2012.
 
 //Simplify constructor takes no arguments
-var Simplify = function(player_name)
+var Simplify = function()
 {
 	/* Internal websockets routines */
 
