@@ -33,18 +33,18 @@
       title = mix.get('name');
       album = mix.get('genres')[0];
       duration = mix.get('duration') / 1000;
-    };
+    }
     var trackInfo = {
-      author: artist,
-      title: title,
-      album: album,
-      length: duration,
-      uri: url
+      author: artist || 'N/A',
+      title: title || 'N/A',
+      album: album || 'N/A',
+      length: duration || 'N/A',
+      uri: url || 'N/A'
     };
 
     log('Setting track info', trackInfo);
     simplify.setCurrentTrack(trackInfo);
-    artworkUrl = mix.get('cover_urls').sq500
+    artworkUrl = mix.get('cover_urls').sq500;
     simplify.setCurrentArtwork(artworkUrl);
   };
 
@@ -73,7 +73,7 @@
     }).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data) {
       App.Trax.mixPlayer.setVolume(data.amount);
     }).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
-      App.Trax.mixPlayer.trackPlayer.seekTo(data.amount * 1000)
+      App.Trax.mixPlayer.trackPlayer.seekTo(data.amount * 1000);
     });
   };
 
@@ -93,12 +93,12 @@
         });
 
         interval = setInterval(function() {
-          var mixPlayer = App.Trax.mixPlayer
+          var mixPlayer = App.Trax.mixPlayer;
           if (mixPlayer) {
             clearInterval(interval);
             mixPlayer.on('play', function() {
               log('play');
-              simplify.setPlaybackPlaying()
+              simplify.setPlaybackPlaying();
             });
             mixPlayer.on('pause', function() {
               log('paused');
@@ -106,11 +106,11 @@
               simplify.setPlaybackPaused();
             });
             mixPlayer.on('doneLoading', function() {
-              log('done loading')
+              log('done loading');
               updateSimplifyMetadata(simplify);
             });
             mixPlayer.trackPlayer.on('seconds:1', function() {
-              log('1 second')
+              log('1 second');
               updateSimplifyMetadata(simplify);
             });
           }
