@@ -54,6 +54,17 @@ if (window.top == window)
 			return result;
 		}
 
+		//Stop Simplify after clearing Yandex.Music queue
+		var oldClearAll = Mu.Songbird.clearAll;
+		Mu.Songbird.clearAll = function()
+		{
+			var result = oldClearAll.apply(this);
+
+			simplify.setPlaybackStopped();
+
+			return result;
+		}
+
 		//Handling incoming events
 		simplify.bindToVolumeRequest(function()
 		{
