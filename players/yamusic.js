@@ -15,7 +15,7 @@ if (window.top == window)
 		{
 			var song = oldGetCurrentSongInfo.apply(this);
 
-			if (window.lastTrackId != song.getTrack().id)
+			if (Mu.Player.state !== "waiting" && window.lastTrackId != song.getTrack().id)
 			{
 				//New track! Sending to Simplify
 				simplify.setCurrentTrack({"author" : song.getTrack().artist, 
