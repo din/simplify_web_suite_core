@@ -15,7 +15,7 @@ if (window.top == window)
 		{
 			var song = oldGetCurrentSongInfo.apply(this);
 
-			if (window.lastTrackId != song.getTrack().id)
+			if (Mu.Player.state !== "waiting" && window.lastTrackId != song.getTrack().id)
 			{
 				//New track! Sending to Simplify
 				simplify.setCurrentTrack({"author" : song.getTrack().artist, 
@@ -50,6 +50,17 @@ if (window.top == window)
 			var result = oldPlay.apply(this, argument);
 
 			simplify.setPlaybackPlaying();
+
+			return result;
+		}
+
+		//Stop Simplify after clearing Yandex.Music queue
+		var oldClearAll = Mu.Songbird.clearAll;
+		Mu.Songbird.clearAll = function()
+		{
+			var result = oldClearAll.apply(this);
+
+			simplify.setPlaybackStopped();
 
 			return result;
 		}
