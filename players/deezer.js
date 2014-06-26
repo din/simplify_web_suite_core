@@ -13,9 +13,9 @@ if (window.top == window)
 		simplify.setCurrentPlayer("Deezer");
 
 		//Overriding method for song information retrival
-		var oldGetCurrentSongInfo = dzPlayer.getCurrentSongInfo;
+		var oldGetCurrentSongInfo = dzPlayer.getCurrentSong;
 		window.lastTrackId = null;
-		dzPlayer.getCurrentSongInfo = function()
+		dzPlayer.getCurrentSong = function()
 		{
 			var song = oldGetCurrentSongInfo.apply(this);
 			
@@ -39,8 +39,8 @@ if (window.top == window)
 		}
 
 		//Pausing Simplify when Deezer paused
-		var oldPause = dzPlayer.pause;
-		dzPlayer.pause = function()
+		var oldPause = dzPlayer.control.pause;
+		dzPlayer.control.pause = function()
 		{
 			var result = oldPause.apply(this);
 
@@ -50,8 +50,8 @@ if (window.top == window)
 		}
 
 		//Restoring playback 
-		var oldPlay = dzPlayer.play;
-		dzPlayer.play = function(argument)
+		var oldPlay = dzPlayer.control.play;
+		dzPlayer.control.play = function(argument)
 		{
 			var result = oldPlay.apply(this, argument);
 
@@ -77,32 +77,32 @@ if (window.top == window)
 		{
 
 			if (typeof dzPlayer == "undefined") return;
-			dzPlayer.prevSong();
+			dzPlayer.control.prevSong();
 
 		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function()
 		{
 
 			if (typeof dzPlayer == "undefined") return;
-			dzPlayer.nextSong();
+			dzPlayer.control.nextSong();
 		
 		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
 		{
 
 			if (typeof dzPlayer == "undefined") return;	
-			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) dzPlayer.play();
-			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) dzPlayer.pause();
+			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) dzPlayer.control.play();
+			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) dzPlayer.control.pause();
 		
 		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data)
 		{
 
 			if (data["amount"] == null || typeof dzPlayer == "undefined") return;
-			dzPlayer.setVolume(data["amount"]/100);
+			dzPlayer.control.setVolume(data["amount"]/100);
 
 		}).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data)
 		{
 
 			if (data["amount"] == null || typeof dzPlayer == "undefined") return;
-			dzPlayer.seek(parseFloat(data["amount"])/dzPlayer.duration);
+			dzPlayer.control.seek(parseFloat(data["amount"])/dzPlayer.duration);
 
 		});
 
