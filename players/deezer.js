@@ -18,7 +18,7 @@ if (window.top == window)
 		dzPlayer.getCurrentSong = function()
 		{
 			var song = oldGetCurrentSongInfo.apply(this);
-			
+
 			//Checking what's coming on here
 			if (window.lastTrackId != song["SNG_ID"])
 			{
@@ -30,7 +30,7 @@ if (window.top == window)
 
 				//Taking artwork from Deezer itself
 				simplify.setCurrentArtwork("http://api.deezer.com/2.0/album/" + song["ALB_ID"] + "/image?size=big");
-
+	
 				//What is this? What is that?
 				window.lastTrackId = song["SNG_ID"];
 			}
@@ -78,12 +78,14 @@ if (window.top == window)
 
 			if (typeof dzPlayer == "undefined") return;
 			dzPlayer.control.prevSong();
+			//if (dzPlayer.isPlaying() == true) dzPlayer.getCurrentSong();
 
 		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function()
 		{
 
 			if (typeof dzPlayer == "undefined") return;
 			dzPlayer.control.nextSong();
+			//if (dzPlayer.isPlaying() == true) dzPlayer.getCurrentSong();
 		
 		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
 		{

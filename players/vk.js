@@ -8,7 +8,7 @@ if (window.top == window)
 		if (typeof audioPlayer == "undefined")
 		{
 			console.log("Waiting for audio player to be available...");
-			setTimeout(setupSimpify, 5000);
+			setTimeout(setupSimpify, 3000);
 			return;
 		}
 
@@ -54,6 +54,7 @@ if (window.top == window)
 					//No artwork can be extracted from Vkontakte, Simplify will find it by itself
 					simplify.setCurrentTrack(current_track);
 					simplify.setCurrentArtwork(null);
+					if (audioPlayer.player.paused() == false) simplify.setPlaybackPlaying();
 
 					//Storing last track identifier
 					window.lastTrackID = current_track["id"];

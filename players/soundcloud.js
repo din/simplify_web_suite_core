@@ -34,6 +34,7 @@
       length: soundAttributes.duration / 1000,
       uri: soundAttributes.permalink_url,
     });
+
     simplify.setCurrentArtwork(soundAttributes.artwork_url);
   };
 
