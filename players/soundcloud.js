@@ -12,7 +12,9 @@
   var currentSound = function() { return playManager.getCurrentSound(); };
 
   var updateSimplifyMetadata = function(simplify) {
-    var author, title = null;
+    var author,
+      title = null,
+      artworkUrl;
 
     sound = currentSound();
     if (!sound) return;
@@ -35,7 +37,12 @@
       uri: soundAttributes.permalink_url,
     });
 
-    simplify.setCurrentArtwork(soundAttributes.artwork_url);
+    if (soundAttributes.artwork_url) {
+      artworkUrl = soundAttributes.artwork_url.replace(
+        /-large\./, '-t500x500.'
+      );
+      simplify.setCurrentArtwork(artworkUrl);
+    }
   };
 
   var setupSimplifyBindings = function(simplify) {
