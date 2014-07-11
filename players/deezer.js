@@ -15,10 +15,11 @@ if (window.top == window)
 		//Overriding method for song information retrival
 		var oldGetCurrentSongInfo = dzPlayer.getCurrentSong;
 		window.lastTrackId = null;
+		window.trackChanged = true;
 		dzPlayer.getCurrentSong = function()
 		{
 			var song = oldGetCurrentSongInfo.apply(this);
-
+	
 			//Checking what's coming on here
 			if (window.lastTrackId != song["SNG_ID"])
 			{
@@ -63,40 +64,42 @@ if (window.top == window)
 		//Handling incoming events
 		simplify.bindToVolumeRequest(function()
 		{
-
 			if (typeof dzPlayer == "undefined") return 0;
 			return dzPlayer.volume*100;
 
 		}).bindToTrackPositionRequest(function()
 		{
-
 			if (typeof dzPlayer == "undefined") return 0;
+			if (window.trackChanged == false) { return 0; }
+
 			return parseInt(dzPlayer.position);
 
 		}).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function()
 		{
-
 			if (typeof dzPlayer == "undefined") return;
 			dzPlayer.control.prevSong();
-			//if (dzPlayer.isPlaying() == true) dzPlayer.getCurrentSong();
+			simplify.setPlaybackPlaying();
+
+			window.trackChanged = false;
+			setTimeout(function() { window.trackChanged = true; }, 300);
 
 		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function()
 		{
-
 			if (typeof dzPlayer == "undefined") return;
 			dzPlayer.control.nextSong();
-			//if (dzPlayer.isPlaying() == true) dzPlayer.getCurrentSong();
+			simplify.setPlaybackPlaying();
+
+			window.trackChanged = false;
+			setTimeout(function() { window.trackChanged = true; }, 300);
 		
 		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
 		{
-
 			if (typeof dzPlayer == "undefined") return;	
 			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) dzPlayer.control.play();
 			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) dzPlayer.control.pause();
 		
 		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data)
 		{
-
 			if (data["amount"] == null || typeof dzPlayer == "undefined") return;
 			dzPlayer.control.setVolume(data["amount"]/100);
 
