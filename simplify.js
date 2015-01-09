@@ -12,7 +12,7 @@ var Simplify = function()
 	//This methods looks for running instance of Simplify server and connects to it in case
 	var internal_connect = function()
 	{
-		connection = new WebSocket("ws://localhost:25984/");
+		connection = new WebSocket("ws://127.0.0.1:25984/");
 
 		//Stopping polling when connected
 		connection.onopen = function()

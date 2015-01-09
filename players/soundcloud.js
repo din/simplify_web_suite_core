@@ -12,6 +12,7 @@
   var currentSound = function() { return playManager.getCurrentSound(); };
 
   var updateSimplifyMetadata = function(simplify) {
+
     var author,
       title = null,
       artworkUrl;
@@ -78,28 +79,58 @@
 
   if (window.top == window) {
     window.addEventListener('load', function() {
-      var simplify = new Simplify();
-      simplify.setCurrentPlayer('SoundCloud');
 
-      playManager = require('lib/play-manager');
-      eventBus = require('event-bus');
-      libAudio = require("lib/audio");
-      setupSimplifyBindings(simplify);
-      updateSimplifyMetadata(simplify);
+      webpackJsonp([], {0: function(a, b, require) 
+      { 
+      
+		var modules = require.c;
 
-      window.addEventListener('unload', function() {
-        simplify.closeCurrentPlayer();
-      });
+      	for (var moduleid in modules)
+      	{
+      		var el = require(moduleid);
 
-      eventBus.on('audio:play', function(sound) {
+      		if (typeof el["playCurrent"] == "function")
+			{
+				playManager = el;
+			}
+			else if (typeof el["getSettings"] == "function")
+			{
+				libAudio = el;
+			}
+			else if (typeof el["trigger"] == "function" 
+			       && typeof el["bind"] == "function"
+			       && typeof el["listenToOnce"] == "function" &&
+			       typeof el["$"] != "function" &&
+			       typeof el["broadcast"] == "function")
+			{
+				eventBus = el;
+			}
+      	}     
+
+        var simplify = new Simplify();
+        simplify.setCurrentPlayer('SoundCloud');
+ 	
+        setupSimplifyBindings(simplify);
         updateSimplifyMetadata(simplify);
-        simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);
-      });
 
-      eventBus.on('audio:pause', function() {
-        updateSimplifyMetadata(simplify);
-        simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
-      });
+        window.addEventListener('unload', function() {
+          simplify.closeCurrentPlayer();
+        });
+
+        eventBus.on('audio:play', function(sound) {
+        
+          updateSimplifyMetadata(simplify);
+          simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);
+        });
+
+        eventBus.on('audio:pause', function() {
+          updateSimplifyMetadata(simplify);
+          simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        });
+
+      }});
+
+    
     });
   }
 })();
