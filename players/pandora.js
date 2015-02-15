@@ -29,7 +29,15 @@ if (window.top == window)
 			track["id"] = track["author"] + track["title"] + track["album"];
 
 			return track;
-		} 
+		};
+
+		// $( ".playButton" ).click(function() {
+		// 	simplify.setPlaybackPlaying();
+		// });
+
+		// $(".pauseButton").click(function() {
+		// 	simplify.setPlaybackPaused();
+		// });
 
 		//This should be somehow fixed/updated/whatever
 		//Hackish method to extract current track playing in Pandora
@@ -52,16 +60,18 @@ if (window.top == window)
 			{
 				simplify.setCurrentTrack(track);
 				simplify.setCurrentArtwork();
-	
-				if ($(".playButton").is(":visible") == true)
-				{
-					simplify.setPlaybackPaused();
-				}
-
 				window.lastTrackId = track["id"];
 			}
+			if ($(".playButton").is(":visible") == true)
+			{
+				simplify.setPlaybackPaused();
+			}
+			if ($(".playButton").is(":visible") == false)
+			{
+				simplify.setPlaybackPlaying();
+			}
 
-		}, 4000);
+		}, 1000);
 
 		//Handling incoming events
 		simplify.bindToVolumeRequest(function()
