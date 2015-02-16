@@ -108,7 +108,7 @@ if (window.top == window) {
             if (data["amount"] == null || typeof App.Trax.mixPlayer == "undefined") return;
             App.Trax.mixPlayer.setVolume(data.amount);
         }).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
-            if (data["amount"] == null || typeof dzPlayer == "undefined") return;
+            if (data["amount"] == null || typeof App.Trax.mixPlayer == "undefined") return;
             App.Trax.mixPlayer.trackPlayer.seekTo(parseFloat(data["amount"]) * 1000);
         });
 
