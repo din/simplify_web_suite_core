@@ -46,11 +46,6 @@
 
   if (window.top == window) {
     window.addEventListener('load', function() {
-      var body = document.getElementsByTagName("body")[0];
-      var script = document.createElement('script');
-      script.type = "text/javascript";
-      script.src = "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js";
-      body.appendChild(script);
       var simplify = new Simplify();
       simplify.setCurrentPlayer('Plex');
 
