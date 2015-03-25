@@ -46,7 +46,7 @@
     }
     
     // Artwork.
-    var url = $('.mini-controls-left .media-poster').data('image-url');
+    var url = $('.mini-controls-left .media-poster').attr('data-image-url');
     if (url) {
       url = url.replace(/=160/g, "=512");
       if (lastURL != url) {
