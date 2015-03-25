@@ -1,4 +1,6 @@
 (function() {
+  var lastURL = null;
+  
   function readSlider() {
     if ($('.seek-bar-container').length && $('.player-slider-progress').length) {
       var time = $('.seek-bar-container .player-position').text().split(':');
@@ -17,7 +19,7 @@
   }
   var updateSimplifyMetadata = function(simplify, checkLast) {
     var artist = $('.media-title .grandparent-title').text();
-    var title = $('.media-title .item-title').text();
+    var title = $('.media-title .item-title').text().replace('[GN MATCH]', '');
     var playhead = readSlider();
     
     if (artist && title) {
@@ -32,15 +34,25 @@
       }});
     }
 
+    // State.
     if ($('.mini-player').length) {
       if ($('.mini-controls-left .play-btn').css('display') == 'none') {
         simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);
-        //simplify.setCurrentArtwork(null);
       } else {
         simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
       }
     } else {
       simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_STOPPED);
+    }
+    
+    // Artwork.
+    var url = $('.mini-controls-left .media-poster').data('image-url');
+    if (url) {
+      url = url.replace(/=160/g, "=512");
+      if (lastURL != url) {
+        simplify.setCurrentArtwork(url);
+        lastURL = url;
+      }
     }
   };
 
