@@ -74,6 +74,8 @@
         simplify.setCurrentArtwork(url);
         lastURL = url;
       }
+    } else {
+      simplify.setCurrentArtwork(null);
     }
   };
 
