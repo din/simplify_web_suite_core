@@ -1,8 +1,8 @@
 (function() {
   'use strict';
   var lastURL = null;
-  
-  function readSlider() {
+
+  function readPositionSlider() {
     if ($('.seek-bar-container').length && $('.player-slider-progress').length) {
       var time = $('.seek-bar-container .player-position').text().split(':');
       time = parseInt(time[0], 10)*60 + parseInt(time[1], 10);
@@ -18,10 +18,15 @@
       return { max: 0, min: 0, current: 0 };
     }
   }
-  var updateSimplifyMetadata = function(simplify, checkLast) {
+
+  function readVolumeSlider() {
+    return $('.mini-controls .player-volume-slider').data('value');
+  }
+
+  var updateSimplifyMetadata = function(simplify) {
     var artist = $('.media-title .grandparent-title').text();
     var title = $('.media-title .item-title').text().replace('[GN MATCH]', '');
-    var playhead = readSlider();
+    var playhead = readPositionSlider();
 
     var features = {
       disable_previous_track: $('.previous-btn').hasClass('disabled'),
@@ -74,9 +79,11 @@
       }, 1000);
 
       simplify.bindToTrackPositionRequest(function() {
-        var playhead = readSlider();
+        var playhead = readPositionSlider();
         return playhead.current;
 
+      }).bindToVolumeRequest(function() {
+        return readVolumeSlider();
       }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
         $('.mini-controls-left .next-btn').click();
       }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
@@ -87,7 +94,7 @@
         else
           $('.mini-controls-left .play-btn').click();
       }).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
-        var playhead = readSlider();
+        var playhead = readPositionSlider();
         var $el = $('.mini-controls .player-seek-bar');
         var pageX = $el.offset().left + $el.width() * (data.amount / playhead.max);
 
