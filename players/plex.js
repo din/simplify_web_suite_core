@@ -22,17 +22,24 @@
     var artist = $('.media-title .grandparent-title').text();
     var title = $('.media-title .item-title').text().replace('[GN MATCH]', '');
     var playhead = readSlider();
-    
+
+    var features = {
+      disable_previous_track: $('.previous-btn').hasClass('disabled'),
+      disable_next_track: $('.next-btn').hasClass('disabled')
+    };
+
+    if (!playhead.max) {
+      features.disable_track_seeking = true;
+    }
+
     if (artist && title) {
-      simplify.setCurrentTrack({ 
-        author: artist, 
-        title: title, 
-        album: '', length: playhead.max, 
-        features: {
-          disable_track_seeking: true,
-          disable_previous_track: $('.previous-btn').hasClass('disabled'),
-          disable_next_track: $('.next-btn').hasClass('disabled')
-      }});
+      simplify.setCurrentTrack({
+        author: artist,
+        title: title,
+        album: '',
+        length: playhead.max,
+        features: features
+      });
     }
 
     // State.
@@ -79,7 +86,18 @@
           $('.pause-btn').click();
         else
           $('.mini-controls-left .play-btn').click();
-      })
+      }).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
+        var playhead = readSlider();
+        var $el = $('.mini-controls .player-seek-bar');
+        var pageX = $el.offset().left + $el.width() * (data.amount / playhead.max);
+
+        var mousedown = new $.Event('mousedown');
+        var mouseup = new $.Event('mouseup');
+        mousedown.pageX = pageX;
+        mouseup.pageX = pageX;
+
+        $el.trigger(mousedown).trigger(mouseup);
+      });
 
       window.addEventListener('unload', function() {
         simplify.closeCurrentPlayer();
