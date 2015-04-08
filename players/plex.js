@@ -69,7 +69,7 @@
       var simplify = new Simplify();
       simplify.setCurrentPlayer('Plex');
 
-      setInterval(function() {
+      var interval = setInterval(function() {
         updateSimplifyMetadata(simplify, true);
       }, 1000);
 
@@ -97,6 +97,8 @@
         mouseup.pageX = pageX;
 
         $el.trigger(mousedown).trigger(mouseup);
+      }).bind(Simplify.MESSAGE_DID_SERVER_SHUTDOWN, function() {
+        clearInterval(interval);
       });
 
       window.addEventListener('unload', function() {
