@@ -21,6 +21,14 @@
 
   function readVolumeSlider() {
     return $('.mini-controls .player-volume-slider').data('value');
+
+  function clickSlider($el, pageX) {
+    var mousedown = new $.Event('mousedown');
+    var mouseup = new $.Event('mouseup');
+    mousedown.pageX = pageX;
+    mouseup.pageX = pageX;
+
+    $el.trigger(mousedown).trigger(mouseup);
   }
 
   var updateSimplifyMetadata = function(simplify) {
@@ -97,13 +105,11 @@
         var playhead = readPositionSlider();
         var $el = $('.mini-controls .player-seek-bar');
         var pageX = $el.offset().left + $el.width() * (data.amount / playhead.max);
-
-        var mousedown = new $.Event('mousedown');
-        var mouseup = new $.Event('mouseup');
-        mousedown.pageX = pageX;
-        mouseup.pageX = pageX;
-
-        $el.trigger(mousedown).trigger(mouseup);
+        clickSlider($el, pageX);
+      }).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data) {
+        var $el = $('.mini-controls .player-volume-slider');
+        var pageX = $el.offset().left + $el.width() * (data.amount / 100);
+        clickSlider($el, pageX);
       }).bind(Simplify.MESSAGE_DID_SERVER_SHUTDOWN, function() {
         clearInterval(interval);
       });
