@@ -68,14 +68,14 @@
     
     // Artwork.
     var url = $('.mini-controls-left .media-poster').attr('data-image-url');
-    if (url) {
-      url = url.replace(/=160/g, "=512");
-      if (lastURL != url) {
+    if (lastURL != url) {
+      lastURL = url;
+      if (url) {
+        url = url.replace(/=160/g, '=512');
         simplify.setCurrentArtwork(url);
-        lastURL = url;
+      } else {
+        simplify.setCurrentArtwork(null);
       }
-    } else {
-      simplify.setCurrentArtwork(null);
     }
   };
 
