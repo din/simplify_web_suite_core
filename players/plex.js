@@ -1,8 +1,10 @@
-(function() {
+/* global Simplify:false, $:false */
+(function () {
   'use strict';
   var lastURL = null;
   var lastState = null;
   var lastSlug = null;
+  var continueScheduling = true;
 
   function readPositionSlider() {
     if ($('.seek-bar-container').length && $('.player-slider-progress').length) {
@@ -38,22 +40,28 @@
     var simplify = new Simplify();
     simplify.setCurrentPlayer('Plex');
 
-    function updateSimplifyMetadata() {
-      var $controls = $('.mini-controls');
+    window.addEventListener('beforeunload', function () {
+      simplify.closeCurrentPlayer();
+    });
+
+    function setCurrentTrack($controls) {
       var $poster = $controls.find('.media-poster');
-      var imageUrl = $poster.attr('data-image-url');
       var title = $poster.attr('data-title') || '';
       var album = $poster.attr('data-parent-title') || '';
       var artist = $poster.attr('data-grandparent-title') || '';
       var playhead = readPositionSlider();
 
+      var $prevBtn = $controls.find('.previous-btn');
+      var $nextBtn = $controls.find('.next-btn');
+
+      // Detect features
       var features = {};
 
-      if ($controls.find('.previous-btn').hasClass('disabled')) {
+      if ($prevBtn.hasClass('disabled')) {
         features.disable_previous_track = true;
       }
 
-      if ($controls.find('.next-btn').hasClass('disabled')) {
+      if ($nextBtn.hasClass('disabled')) {
         features.disable_next_track = true;
       }
 
@@ -62,7 +70,7 @@
       }
 
       var slug = [
-        artist, album, title,
+        title, album, artist,
         playhead.max,
         features.disable_previous_track,
         features.disable_next_track,
@@ -70,7 +78,6 @@
       ].join(':');
 
       if (slug !== lastSlug) {
-        console.debug('setting current track: %o', slug);
         lastSlug = slug;
         simplify.setCurrentTrack({
           author: artist,
@@ -80,11 +87,15 @@
           features: features
         });
       }
+    }
 
+    function setPlaybackState($controls) {
       // State.
       var state;
-      if ($('.mini-player').length) {
-        if ($('.mini-controls-left .play-btn').css('display') == 'none') {
+      if ($controls.length) {
+        var $playBtn = $controls.find('.play-btn');
+
+        if ($playBtn.css('display') === 'none') {
           state = Simplify.PLAYBACK_STATE_PLAYING;
         } else {
           state = Simplify.PLAYBACK_STATE_PAUSED;
@@ -97,6 +108,11 @@
         lastState = state;
         simplify.setNewPlaybackState(state);
       }
+    }
+
+    function setArtwork($controls) {
+      var $poster = $controls.find('.media-poster');
+      var imageUrl = $poster.attr('data-image-url');
 
       // Artwork.
       if (lastURL != imageUrl) {
@@ -108,46 +124,67 @@
           simplify.setCurrentArtwork(null);
         }
       }
-    };
+    }
 
-    var interval = setInterval(updateSimplifyMetadata, 1000);
+    function updateSimplifyMetadata() {
+      var $controls = $('.mini-controls');
+      setCurrentTrack($controls);
+      setPlaybackState($controls);
+      setArtwork($controls);
+    }
 
-    simplify.bindToTrackPositionRequest(function() {
+    simplify.bindToTrackPositionRequest(function () {
       var playhead = readPositionSlider();
       return playhead.current;
 
     }).bindToVolumeRequest(function() {
       return readVolumeSlider();
-    }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
-      $('.mini-controls-left .next-btn').click();
-    }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
-      $('.mini-controls-left .previous-btn').click();
-    }).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function() {
-      if ($('.mini-controls-left .play-btn').css('display') == 'none') {
+
+    }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function () {
+      $('.mini-controls .next-btn').click();
+
+    }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function () {
+      $('.mini-controls .previous-btn').click();
+
+    }).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function () {
+      if ($('.mini-controls .play-btn').css('display') === 'none') {
         $('.pause-btn').click();
       } else {
-        $('.mini-controls-left .play-btn').click();
+        $('.mini-controls .play-btn').click();
       }
+
     }).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
       var playhead = readPositionSlider();
       var $el = $('.mini-controls .player-seek-bar');
       var pageX = $el.offset().left + $el.width() * (data.amount / playhead.max);
       clickSlider($el, pageX);
-    }).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data) {
+
+    }).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function (data) {
       var $el = $('.mini-controls .player-volume-slider');
       var pageX = $el.offset().left + $el.width() * (data.amount / 100);
       clickSlider($el, pageX);
-    }).bind(Simplify.MESSAGE_DID_SERVER_SHUTDOWN, function() {
-      clearInterval(interval);
+
+    }).bind(Simplify.MESSAGE_DID_SERVER_SHUTDOWN, function () {
+      continueScheduling = false;
+
     });
 
-    window.addEventListener('unload', function() {
-      simplify.closeCurrentPlayer();
-    });
+    function scheduleUpdateSimplifyMetadata() {
+      if (typeof $ !== 'undefined') {
+        updateSimplifyMetadata();
+      }
+
+      if (continueScheduling) {
+        window.setTimeout(scheduleUpdateSimplifyMetadata, 1000);
+      }
+    }
+
+    scheduleUpdateSimplifyMetadata();
   }
 
-  if (window.top == window) {
+  // Only run extension when Plex is outermost frame
+  if (window.top === window) {
     window.addEventListener('load', onLoad);
   }
 
-})();
+}());
