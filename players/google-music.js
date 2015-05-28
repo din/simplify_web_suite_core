@@ -65,11 +65,11 @@
         var playhead = readSlider($("#material-player-progress"));
         return playhead.current / 1000;
       }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
-        $("button[data-id=forward]").click();
+        $("sj-icon-button[data-id=forward]").click();
       }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
-        $("button[data-id=rewind]").click();
+        $("sj-icon-button[data-id=rewind]").click();
       }).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function() {
-        $("button[data-id=play-pause]").click();
+        $("sj-icon-button[data-id=play-pause]").click();
       });
 
       window.addEventListener('unload', function() {
