@@ -16,14 +16,14 @@
     }
   }
   var updateSimplifyMetadata = function(simplify, checkLast) {
-    var playhead = readSlider($("#slider"));
+    var playhead = readSlider($("#material-player-progress"));
 
-    var title = $("#playerSongTitle").text();
+    var title = $("#player-song-title").text();
     var album = $(".player-album").text();
     var artist = $("#player-artist").text();
     var albumArt = $("#playingAlbumArt");
     if(albumArt[0]) {
-      albumArt = albumArt[0].src.replace('=s130-e','=s1000-e');
+      albumArt = albumArt[0].src.replace('=s90-c-e','=s1000-c-e');
     }
 
     if(title && artist && album) {
@@ -62,15 +62,15 @@
       }, 1000);
 
       simplify.bindToTrackPositionRequest(function() {
-        var playhead = readSlider($("#slider"));
+        var playhead = readSlider($("#material-player-progress"));
         return playhead.current / 1000;
       }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
-        $("button[data-id=forward]").click();
+        $("sj-icon-button[data-id=forward]").click();
       }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
-        $("button[data-id=rewind]").click();
+        $("sj-icon-button[data-id=rewind]").click();
       }).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function() {
-        $("button[data-id=play-pause]").click();
-      })
+        $("sj-icon-button[data-id=play-pause]").click();
+      });
 
       window.addEventListener('unload', function() {
         simplify.closeCurrentPlayer();
