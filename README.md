@@ -1,6 +1,6 @@
 # Simplify Web Suite Core
 
-This repository contains source code to interact with [Simplify](http://pxmates.com/factory/simplify) from one of web-browsers. You can find an overview of our protocol in `simplify.js`. All supported web-players are in the `players/` subdirectory.
+This repository contains source code to interact with [Simplify](http://mmth.us/simplify) from one of web-browsers. You can find an overview of our protocol in `simplify.js`. All supported web-players are in the `players/` subdirectory.
 
 ## Building and working with extensions builds
 
