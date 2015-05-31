@@ -1,3 +1,6 @@
+// Google Music
+// @hostname = play.google.com
+
 (function() {
   var lastTrack = null;
   function readSlider(el) {

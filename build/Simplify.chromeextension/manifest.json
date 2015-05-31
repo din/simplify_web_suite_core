@@ -18,6 +18,7 @@
   		[
   		"*://rdio.com/*", 
 "*://deezer.com/*", 
+"*://play.google.com/*", 
 "*://pandora.com/*", 
 "*://plex.tv/*", 
 "*://localhost/*", 
@@ -36,6 +37,7 @@
 	"web_accessible_resources" : ["data/simplify.js", 
 								  "data/8tracks.js", 
 "data/deezer.js", 
+"data/google-music.js", 
 "data/pandora.js", 
 "data/plex.js", 
 "data/podwrangler.js", 

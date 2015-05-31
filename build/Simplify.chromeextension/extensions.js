@@ -4,6 +4,7 @@
 var scripts = {
 	"rdio.com" : "data/rdio.js", 
 "deezer.com" : "data/deezer.js", 
+"play.google.com" : "data/google-music.js", 
 "pandora.com" : "data/pandora.js", 
 "plex.tv" : "data/plex.js", 
 "localhost" : "data/plex.js", 
