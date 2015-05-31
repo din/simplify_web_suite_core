@@ -57,25 +57,25 @@ After you added your player or changed its code, run `npm run gulp` to rebuild e
 
 ## Core API
 
-The core class is a set of methods and properties to interact with desktop application (server). It implements basic client-server protocol on top of WebSockets connection. The connection itself is created and maintained by `Simplify` class. It also automatically reconnects if connection to server fails. 
+The core class is a set of methods and properties to interact with the desktop application (server). It implements a basic client-server protocol on top of the WebSockets connection. The connection itself is created and maintained by the `Simplify` class. It also automatically reconnects if the connection to server fails. 
 
-Core API provides you with two types of methods. You can send various messages to server to notify it about some important event on client side. On the other hand, server can also send various messages to client, so Core API allows you to subscribe to incoming events to handle them appropriately. 
+Core API provides you with two types of methods. You can send various messages to the server to notify it about some important event on the client side. On the other hand, the server can also send various messages to the client, so Core API allows you to subscribe to incoming events to handle them appropriately. 
 
-Note that you are not supposed to cache any data, like player name, track information, or artwork links. All cache is stored inside the core class. If WebSockets connection to server eventually fails, the client will restore everything when connection becomes available.  
+Note that you are not supposed to cache any data, like player names, track information, or artwork links. All cache is stored inside the core class. If the WebSockets connection to the server eventually fails, the client will restore everything when the connection becomes available.  
 
 ### Initialization
 
-You can set up client by instantiating `Simplify`:
+You can set up a client by instantiating `Simplify`:
 
 ```var simplify = new Simplify();```
 
 ### setCurrentPlayer(name)
 
-Sends current player name to server. Call this method after you've created your own instance of `Simplify`. Supply player name as a string. Avoid long names.
+Sends the current player name to the server. Call this method after you've created your own instance of `Simplify`. Supply a player name as a string. Avoid long names.
 
 ### closeCurrentPlayer
 
-Tells server that the current client is not active anymore. Usually you call this method when page unloads, like:
+Tells the server that the current client is not active anymore. Usually you call this method when page unloads, like:
 
 ```
 var simplify = new Simplify();
@@ -90,7 +90,7 @@ window.addEventListener("unload", function()
 
 ### setNewPlaybackState(state)
 
-Notifies server that the playback state should be changed. A `state` variable must be one of predefined constants:
+Notifies the server that the playback state should be changed. A `state` variable must be one of the predefined constants:
 
 ```
 Simplify.PLAYBACK_STATE_PLAYING
@@ -98,11 +98,11 @@ Simplify.PLAYBACK_STATE_PAUSED
 Simplify.PLAYBACK_STATE_STOPPED
 ```
 
-You can also use one of predefined methods to change playback state: `setPlaybackPaused`, `setPlaybackPlaying` and `setPlaybackStopped`.
+You can also use one of the predefined methods to change the playback state: `setPlaybackPaused`, `setPlaybackPlaying` and `setPlaybackStopped`.
 
 ### setCurrentTrack(track)
 
-Sends information about current track to server. This method should be called when track change occurs. This method must not be called on playback state change. 
+Sends the information about the current track to the server. This method should be called when a track change occurs. This method must not be called on a playback state change. 
 
 `track` is a dictionary of values. You fill it with all known information about the current track:
 
@@ -116,7 +116,7 @@ Sends information about current track to server. This method should be called wh
 }
 ```
 
-Sometimes you also may need to tell server that current player doesn't support some features, like seeking tracks or selecting previous track. You can send this useful information by appending `features` key to the aforementioned dictionary:
+Sometimes you also may need to tell the server that the current player doesn't support some features, like seeking tracks or selecting previous track. You can send this useful information by appending `features` key to the aforementioned dictionary:
 
 ```
 {
@@ -132,15 +132,15 @@ Sometimes you also may need to tell server that current player doesn't support s
 }
 ```
 
-You do not need to cache any information about track. The core class caches everything if necessary.
+You do not need to cache any information about the track. The core class caches everything if necessary.
 
 ### setCurrentArtwork(uri)
 
-Notifies server about artwork for the current track. You should supply either absolute URI to some artwork or `null` as an `uri` argument. If `null`, server will try to find artwork for this track by itself. 
+Notifies the server about a new artwork for the current track. You should supply either an absolute URI to some artwork or `null` as an `uri` argument. If it is `null`, server will try to find an artwork for this track by itself. 
 
 ### bindToVolumeRequest(callback)
 
-Server may occassionaly request current player's volume. It must be returned as an integer (min. 0 and max. 100) from your `callback` method:
+The server may occassionaly request the current player's volume. It must be returned as an integer (min. 0 and max. 100) from your `callback` method:
 
 ```
 simplify.bindToVolumeRequest(function()
@@ -151,7 +151,7 @@ simplify.bindToVolumeRequest(function()
 
 ### bindToTrackPositionRequest(callback)
 
-Server may occassionaly request current player's track position. It must be returned as an integer representing current track position in seconds from `callback`:
+The server may occassionaly request the current player's track position. It must be returned as an integer representing the current track position in seconds from `callback`:
 
 ```
 simplify.bindToTrackPositionRequest(function()
@@ -162,11 +162,11 @@ simplify.bindToTrackPositionRequest(function()
 
 ### bind(name, callback)
 
-Adds new handler to specified event. The first argument `name` is one of predefined names of messages. The second argument `callback` is a function that will be called when event arrives. 
+Adds new handler to the specified event. The first argument `name` is one of the predefined names of messages. The second argument `callback` is a function that will be called when an event arrives. 
 
-All events are sent by server as a reaction to any user actions in desktop application. For example, when user modifies volume inside Simplify.app, server sends `Simplify.MESSAGE_DID_CHANGE_VOLUME` to us, and we need to handle it appropriately. 
+All events are sent by the server as a reaction to any user actions in the desktop application. For example, when user modifies volume inside Simplify.app, server sends `Simplify.MESSAGE_DID_CHANGE_VOLUME` to us, and we need to handle it appropriately. 
 
-You are able to chain this command like this:
+You are able to call the function like this:
 
 ```
 simplify.bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function()
@@ -190,7 +190,7 @@ Next track should be selected.
 		
 #### Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE 	
 
-Playback state should be changed. Server pushes `data["state"]` with a desired state:
+Playback state should be changed. The server pushes `data["state"]` with a desired state:
 
 ```
 Simplify.PLAYBACK_STATE_PLAYING
@@ -210,7 +210,7 @@ simplify.bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
 
 #### Simplify.MESSAGE_DID_CHANGE_VOLUME 				
 
-Current volume of player should be changed. Use `data["amount"]` to retrieve new volume, which will be in an interval between 0 and 100.
+Current volume of the player should be changed. Use `data["amount"]` to retrieve new volume, which will be in an interval between 0 and 100.
 
 Example of usage:
 
@@ -236,16 +236,13 @@ simplify.bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data)
 
 #### Simplify.MESSAGE_DID_SERVER_SHUTDOWN
 
-Service message to notify client that server was shut down by user (Simplify.app was closed). You may want to subscribe to this event to release resources or shut down timeouts and/or intervals.
-
+A service message to notify the client that the server was shut down by a user (Simplify.app was closed). You may want to subscribe to this event to release resources or clear timeouts and/or intervals.
 
 ## Usage tips
 
-You need to include `simplify.js` as a content-script to the web-page of interest before any other files. 
+Subscribe to the DOM `loaded` event and create an instance of the `Simplify` class. The first and primary thing to do is to notify the server about the current player by using the `setCurrentPlayer` method. It should be called before any other methods. Set up all event listeners to handle incoming events and implement sending track information when a track changes in the web player.  
 
-Subscribe to DOM loaded event and create an instance of `Simplify` object. The first and primary thing to do is to notify server about the current player by using `setCurrentPlayer` method. It should be called before any other methods. Set up all event listeners to handle incoming events and implement sending track information when track changes in the web player.  
-
-Basic skeleton for handling players:
+A basic skeleton for handling players:
 
 ```
 window.addEventListener("load", function()
