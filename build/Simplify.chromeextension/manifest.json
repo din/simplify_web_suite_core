@@ -1,0 +1,50 @@
+{ 
+	"name" : "Simplify",
+	"version" : "1.6.0",
+	"manifest_version" : 2,
+	"description" : "Simplify for web players: Pandora, Deezer, Vk, SoundCloud, and 8tracks",
+
+	"content_scripts" : [
+		{
+			"run_at"  : "document_end",
+			"matches" : ["http://*/*", "https://*/*"],
+			"js" 		 : ["extensions.js"]
+		}
+	],
+
+	"externally_connectable": {
+
+  		"matches":
+  		[
+  		"*://rdio.com/*", 
+"*://deezer.com/*", 
+"*://pandora.com/*", 
+"*://plex.tv/*", 
+"*://localhost/*", 
+"*://127.0.0.1/*", 
+"*://feedwrangler.net/*", 
+"*://soundcloud.com/*", 
+"*://vk.com/*", 
+"*://music.yandex.ru/*"
+  		]
+	},
+
+	"background" : {
+		"scripts" : ["connection.js"]
+	},
+
+	"web_accessible_resources" : ["data/simplify.js", 
+								  "data/8tracks.js", 
+"data/deezer.js", 
+"data/pandora.js", 
+"data/plex.js", 
+"data/podwrangler.js", 
+"data/rdio.js", 
+"data/soundcloud.js", 
+"data/vk.js", 
+"data/yamusic.js"							
+								]
+}
+
+
+

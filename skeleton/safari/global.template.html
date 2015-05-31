@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="safari-extension://Scripts/Simplify.js"></script>
+		<script type="text/javascript">
+			var players = 
+			{
+				<%- _.map(data.players, function(value, key) 
+					{ 
+						var domains = [];
+
+						value.hostname.split(" ").forEach(function(hostname)
+						{
+							domains.push(util.format("http://%s/*", hostname));
+							domains.push(util.format("https://%s/*", hostname));
+						});
+
+						return util.format('"%s" : %s', path.basename(key), JSON.stringify(domains)); 
+					}).join(", \n")
+				%>
+			};
+
+			var injectScript = function(uri, whitelist)
+			{
+				safari.extension.addContentScript("var script = document.createElement('script');\
+														  script.type = 'text/javascript';\
+														  script.src  = '" + safari.extension.baseURI + uri + "';\
+														  document.body.appendChild(script);", whitelist, [], true);
+			}
+
+			var getAllSites = function(players_list)
+			{
+				var all_sites = [];
+
+				for (var title in players_list)
+				{
+					all_sites = all_sites.concat(players_list[title]);
+				}
+
+				return all_sites;
+			}
+
+			var prepareAllPlayers = function(players_list)
+			{
+				//Loading Simplify base class
+				injectScript("<%= path.join(data.dataDir, data.coreScriptName) %>", getAllSites(players_list));
+
+				for (var title in players_list)
+				{
+					injectScript("<%= path.join(data.dataDir, "/") %>" + title, players_list[title]);
+				}
+			}
+
+			prepareAllPlayers(players);
+		</script>
+	</head>
+</html>

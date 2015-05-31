@@ -1,0 +1,37 @@
+{ 
+	"name" : "Simplify",
+	"version" : "<%= data.version %>",
+	"manifest_version" : 2,
+	"description" : "Simplify for web players: Pandora, Deezer, Vk, SoundCloud, and 8tracks",
+
+	"content_scripts" : [
+		{
+			"run_at"  : "document_end",
+			"matches" : ["http://*/*", "https://*/*"],
+			"js" 		 : ["extensions.js"]
+		}
+	],
+
+	"externally_connectable": {
+
+  		"matches":
+  		[
+  		<%- _.map(data.hosts, function(value, key) { return util.format('"*://%s/*"', key) }).join(", \n") %>
+  		]
+	},
+
+	"background" : {
+		"scripts" : ["connection.js"]
+	},
+
+	"web_accessible_resources" : ["<%= path.join(data.dataDir, data.coreScriptName) %>", 
+								  <%- _.map(data.players, function(value, key) 
+								  	  { return util.format('"%s"', 
+								  	  	path.join(data.dataDir, path.basename(key))) 
+								  	  }).join(", \n") 
+								  %>							
+								]
+}
+
+
+

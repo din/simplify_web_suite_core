@@ -2,7 +2,58 @@
 
 This repository contains source code to interact with [Simplify](http://pxmates.com/factory/simplify) from one of web-browsers. You can find an overview of our protocol in `simplify.js`. All supported web-players are in the `players/` subdirectory.
 
-See also [simplify_web_suite](http://github.com/mmth/simplify_web_suite) repository for more information about using the core in your browser extensions to support various web-players.
+## Building and working with extensions builds
+
+*Important note (31-05-2015): the build system was significantly changed and it doesn't require two repositories anymore since the building process was revamped using [Node.js](https://nodejs.org) and [Gulp 4](http://gulpjs.com). The old repository can be found in the `old` branch and will no longer be maintained.*
+
+### Directory structure
+
+The repository contains files that are necessary to build extensions for Google Chrome and Safari. 
+
+* `build/` contains the resulting directories with the production-ready extensions. You may not directly modify files in this directory, but instead you modify source files and use `gulp` to rebuild extensions again.
+
+* `players/` contains sources for all the players that can be used by Simplify Web Suite Core. They will be automatically copied to the extension directories.
+
+* `skeleton/` contains files and templates that are necessary to automatically create extensions. Files that have `template.` part in it are interpreted as `EJS` templates and processed accordingly. All other files are copied to the appropriate extension directory.
+
+* `config.js` contains version configuration for every browses and directories names.
+
+* `simplify.js` contains the core Simplify object that is used to be used on web-players pages.
+
+* `gulpfile.js` contains the build system which automatically assembles all extensions.
+
+### How to build
+
+In order to build extensions, clone this repository and run `npm install` (make sure you have [Node.js](https://nodejs.org) installed).
+
+When you installed all the necessary packages using the `npm install` command, you are ready to build extensions. Use the `npm run gulp` command which will build extensions to the `build/` directory. Every time you run `npm run gulp`, it will process source files (all files in `players/`, `simplify.js` and all files in `skeleton/`) and override files in the `build/` directory. Make sure you are not editing any files in the `build/` directory, because they will be overriden. Edit source files instead.
+
+### Adding players
+
+Create a new `.js` file in the `players/` directory with a header which contains a `@hostname` variable. All files in the `players/` directory must start with a single-line JavaScript comment `//`. 
+
+If you want to create a file to support a player located at `http://theawesomeplayer.com/`, the header must contain the following value:
+
+```
+// My awesome player
+// @hostname = theawesomeplayer.com
+```
+
+The `@hostname` variable is mandatory and must not be omitted. It may have several domains separated by a white-space:
+
+```
+// @hostname = helloworld.com helloworld.net helloworld.org
+``` 
+
+The header may or may not have any other content, but all the first lines in a file must start with `//`. Please see existing player implementations as an example.
+
+After you added your player or changed its code, run `npm run gulp` to rebuild extensions.
+
+### Build commands
+
+* ```npm run gulp``` builds or rebuils all extension files.
+* ```npm run gulp clean``` cleans the `build/` directory completely.
+* ```npm run gulp watch``` rebuilds all extensions automatically every time you change source files (all files in `players/`, `simplify.js` and all files in `skeleton/`).
 
 ## Core API
 

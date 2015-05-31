@@ -1,0 +1,33 @@
+{
+  "name": "simplify-web-suite",
+  "version": "1.6.0",
+  "description": "Simplify Web Players suite with auto-build system.",
+  "main": "build.js",
+  "scripts": {
+    "gulp": "./node_modules/gulp/bin/gulp.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mmth/simplify_web_suite_core"
+  },
+  "keywords": [
+    "simplify",
+    "players"
+  ],
+  "author": "Semibold Mammoth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mmth/simplify_web_suite_core/issues"
+  },
+  "homepage": "https://github.com/mmth/simplify_web_suite_core",
+  "dependencies": {
+    "async": "^1.0.0",
+    "ejs": "^2.3.1",
+    "fs-extra": "^0.18.4",
+    "glob": "^5.0.10",
+    "gulp": "gulpjs/gulp.git#4.0",
+    "line-reader": "^0.2.4",
+    "minimist": "^1.1.1",
+    "underscore": "^1.8.3"
+  }
+}
