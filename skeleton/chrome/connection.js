@@ -1,5 +1,7 @@
 //Implements a proxy server to connect to a specified web-socket 
 
+var connections = [];
+
 var ChromeProxyServer = function(port)
 {
 	//Storing our port
@@ -14,18 +16,53 @@ var ChromeProxyServer = function(port)
 	{
 		if (message.name == "SIMPLIFY_PROXY_INIT")
 		{
-			console.log("Connected to the proxy client.")
+			console.info("Connected to the proxy client.")
 			_this.setupSocket(message.data);
 		}
 		else if (message.name == "SIMPLIFY_PROXY_NEW_MESSAGE")
 		{
 			_this.socket.send(message.data);
 		}
+		else if (message.name == "SIMPLIFY_PROXY_CLOSE")
+		{
+			_this.socket.onclose = function()
+			{
+				delete _this.socket;
+				_this.socket = null;
+				console.info("WebSocket proxy client has been closed by the client.");
+			}
+
+			_this.socket.close(4000, "Closed by the client.");
+		}
 		else
 		{
-			console.error("Invalid message received: " + message.name + ".");
+			console.info("Invalid message received: " + message.name + ".");
 		}
 	});
+
+	port.onDisconnect.addListener(function()
+	{
+		console.info("Proxy client disconnected.");
+
+		if (_this.socket != null && _this.socket.readyState == WebSocket.OPEN)
+		{
+			_this.socket.close(4000, "Closed by the client.");
+		}
+
+		var removeIdx = -1;
+		for (var i = 0; i < connections.length; i++)
+		{
+			if (connections[i] === _this)
+			{
+				removeIdx = i;
+				break;
+			}
+		}
+
+		connections.splice(removeIdx, 1);
+		delete _this;
+	});
+
 }
 
 ChromeProxyServer.prototype.setupSocket = function(endpoint)
@@ -41,16 +78,14 @@ ChromeProxyServer.prototype.setupSocket = function(endpoint)
 
 	this.socket.onclose = function(event)
 	{
-		console.error("WebSocket proxy client has been closed.");
+		console.info("WebSocket proxy client has been closed.");
 		_this.port.postMessage({ name : "SIMPLIFY_PROXY_CLOSE", data : event });
-		delete _this;
 	}
 
 	this.socket.onerror = function(err)
 	{
-		console.error("WebSocket proxy client has been closed because of an error (" + err + ").");
+		console.info("WebSocket proxy client has been closed because of an error (" + err + ").");
 		_this.port.postMessage({ name : "SIMPLIFY_PROXY_ERROR", data : err });
-		delete _this;
 	}
 
 	this.socket.onmessage = function(event)
@@ -64,6 +99,7 @@ chrome.runtime.onConnectExternal.addListener(function(port)
 {
 	if (port.name == "SimplifyProxyClient")
 	{
-		new ChromeProxyServer(port);
+		connections.push(new ChromeProxyServer(port));
+		console.info("Connection pool has %s connections now.", connections.length)
 	}
 });

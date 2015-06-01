@@ -16,7 +16,7 @@ if (typeof chrome !== "undefined")
 
 		/* Connecting to the proxy server */
 
-		this.port = chrome.runtime.connect("dlhhdadhhkbdmbjaodedmifhpmajidee", { name : "SimplifyProxyClient" });
+		this.port = chrome.runtime.connect("caopaadcaikafcghcgohcfjccglpbmdl", { name : "SimplifyProxyClient" });
 		this.port.postMessage({ name : "SIMPLIFY_PROXY_INIT", data : this.host });
 
 		this.port.onMessage.addListener(function(message)
@@ -30,11 +30,13 @@ if (typeof chrome !== "undefined")
 			{
 				_this.readyState = WebSocket.CLOSED;
 				_this.onclose(message.data);
+				_this.port.disconnect();
 			}
 			else if (message.name == "SIMPLIFY_PROXY_ERROR")
 			{
 				_this.readyState = WebSocket.CLOSED;
 				_this.onerror(message.data);
+				_this.port.disconnect();
 			}
 			else if (message.name == "SIMPLIFY_PROXY_MESSAGE")
 			{
@@ -53,6 +55,11 @@ if (typeof chrome !== "undefined")
 	ChromeProxyClient.prototype.send = function(dataString)
 	{
 		this.port.postMessage({ name : "SIMPLIFY_PROXY_NEW_MESSAGE", data : dataString });
+	}
+
+	ChromeProxyClient.prototype.close = function(code, reason)
+	{
+		this.port.postMessage({ name : "SIMPLIFY_PROXY_CLOSE" });
 	}
 }
 
@@ -88,6 +95,7 @@ var Simplify = function()
 		connection.onclose = function()
 		{
 			delete connection;
+			connection = null;
 			clearTimeout(connection_polling_timer);
 			connection_polling_timer = setTimeout(internal_connect, 4000);
 		}
@@ -96,6 +104,7 @@ var Simplify = function()
 		connection.onerror = function()
 		{
 			delete connection;
+			connection = null;
 			clearTimeout(connection_polling_timer);
 			connection_polling_timer = setTimeout(internal_connect, 4000);
 		}
@@ -254,6 +263,7 @@ var Simplify = function()
 	this.closeCurrentPlayer = function()
 	{
 		internal_send(Simplify.MESSAGE_PLAYER_END);
+		connection.close();
 	}
 
 	//Notifies Simplify about changed playback state
