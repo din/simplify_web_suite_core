@@ -230,7 +230,7 @@ gulp.task("watch", function()
 	var watcher = gulp.watch([path.join(config.skeletonDir, "**", "*.*"), 
 							  config.simplifyCoreScript, 
 							  path.join(config.playersDir, "*.js")], 
-							  gulp.parallel("build"));
+							  gulp.parallel("default"));
 
 	watcher.on("change", function(event)
 	{
