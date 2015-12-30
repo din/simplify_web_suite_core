@@ -90,7 +90,7 @@ ChromeProxyServer.prototype.setupSocket = function(endpoint)
 
 	this.socket.onmessage = function(event)
 	{
-		_this.port.postMessage({ name : "SIMPLIFY_PROXY_MESSAGE", data : event });
+		_this.port.postMessage({ name : "SIMPLIFY_PROXY_MESSAGE", data : event.data });
 	}
 }
 
