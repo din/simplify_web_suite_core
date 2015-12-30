@@ -112,7 +112,7 @@ var Simplify = function()
 		//Receiving messages
 		connection.onmessage = function(message)
 		{
-			internal_deliver_message(message.data);
+			internal_deliver_message(message);
 		}
 	}	
 
