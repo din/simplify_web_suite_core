@@ -17,7 +17,7 @@
 
   		"matches":
   		[
-  		"*://rdio.com/*", 
+  		"*://8tracks.com/*", 
 "*://deezer.com/*", 
 "*://play.google.com/*", 
 "*://pandora.com/*", 
@@ -42,7 +42,6 @@
 "data/pandora.js", 
 "data/plex.js", 
 "data/podwrangler.js", 
-"data/rdio.js", 
 "data/soundcloud.js", 
 "data/vk.js", 
 "data/yamusic.js"							

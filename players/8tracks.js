@@ -1,5 +1,5 @@
 // 8tracks
-// @hostname = rdio.com
+// @hostname = 8tracks.com
 
 if (window.top == window) {
     window.addEventListener("load", function() {
@@ -50,7 +50,7 @@ if (window.top == window) {
                     "length": parseInt(song.trackPlayer.soundManagerPlayer.smSound.durationEstimate / 1000),
                     "features": {"disable_track_seeking" : true, "disable_previous_track" : true}
                 });
-        
+
                 simplify.setCurrentArtwork(App.Trax.mix.get('cover_urls').sq500);
 
                 window.lastTrackId = song.track.attributes["id"];
