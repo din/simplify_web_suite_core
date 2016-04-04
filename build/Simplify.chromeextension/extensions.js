@@ -2,7 +2,7 @@
 
 //All supported sites are listed here
 var scripts = {
-	"rdio.com" : "data/rdio.js", 
+	"8tracks.com" : "data/8tracks.js", 
 "deezer.com" : "data/deezer.js", 
 "play.google.com" : "data/google-music.js", 
 "pandora.com" : "data/pandora.js", 
