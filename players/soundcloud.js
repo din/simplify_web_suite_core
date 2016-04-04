@@ -3,7 +3,22 @@
 // @hostname = soundcloud.com
 
 (function() {
-  var SC_DEBUG_LOG = 1;
+
+  function override(object, methodName, callback) {
+  object[methodName] = callback(object[methodName])
+  }
+
+  function after(extraBehavior) {
+  return function(original) {
+    return function() {
+      var returnValue = original.apply(this, arguments)
+      extraBehavior.apply(this, arguments)
+      return returnValue
+    }
+    }
+  }
+
+  var SC_DEBUG_LOG = 0;
   var debug_log = function() {
     if (SC_DEBUG_LOG) console.debug(arguments);
   };
@@ -98,12 +113,12 @@
       		if (typeof el["playCurrent"] == "function")
 			{
 				playManager = el;
-				console.log("Found playmanager");
+				window.playManager = playManager;
 			}
 			else if (typeof el["getSettings"] == "function")
 			{
 				libAudio = el;
-				console.log("Found libaudio");
+				window.libAudio = libAudio;
 			}
 			else if (typeof el["trigger"] == "function" 
 			       && typeof el["bind"] == "function"
@@ -112,7 +127,7 @@
 			       typeof el["broadcast"] == "function")
 			{
 				eventBus = el;
-				console.log("Found eventbus");
+				window.eventBus = eventBus;
 			}
       	}     
 
@@ -126,17 +141,101 @@
           simplify.closeCurrentPlayer();
         });
 
-        eventBus.on('play', function(sound) {
-        console.log("Audio play", sound)
+        playManager.on('change:currentSound', function(sound) {
+        
           updateSimplifyMetadata(simplify);
           simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);
         });
 
-        eventBus.on('pause', function() {
-        	console.log("Audio pause");
-          updateSimplifyMetadata(simplify);
-          simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
-        });
+        override(playManager, "toggleCurrent", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
+        override(playManager, "toggle", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound() != null)
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
+        override(playManager, "pause", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound() != null)
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
+        override(playManager, "pauseCurrent", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound() != null)
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
+        override(playManager, "play", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound() != null)
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
+         override(playManager, "playCurrent", after(function(original)
+        {
+        	console.log("Toggled current");
+
+        	if (playManager.getCurrentSound() != null)
+        	if (playManager.getCurrentSound().audio.isPlaying())
+        	{
+          		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);	
+        	}
+        	else
+        	{
+        		simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
+        	}
+        }));
+
 
       }});
 
