@@ -31,10 +31,6 @@
   		]
 	},
 
-	"background" : {
-		"scripts" : ["connection.js"]
-	},
-
 	"web_accessible_resources" : ["data/simplify.js", 
 								  "data/8tracks.js", 
 "data/deezer.js", 

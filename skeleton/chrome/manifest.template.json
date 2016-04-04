@@ -21,10 +21,6 @@
   		]
 	},
 
-	"background" : {
-		"scripts" : ["connection.js"]
-	},
-
 	"web_accessible_resources" : ["<%= path.join(data.dataDir, data.coreScriptName) %>", 
 								  <%- _.map(data.players, function(value, key) 
 								  	  { return util.format('"%s"', 

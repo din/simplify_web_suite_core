@@ -3,7 +3,7 @@
 // @hostname = soundcloud.com
 
 (function() {
-  var SC_DEBUG_LOG = 0;
+  var SC_DEBUG_LOG = 1;
   var debug_log = function() {
     if (SC_DEBUG_LOG) console.debug(arguments);
   };
@@ -98,10 +98,12 @@
       		if (typeof el["playCurrent"] == "function")
 			{
 				playManager = el;
+				console.log("Found playmanager");
 			}
 			else if (typeof el["getSettings"] == "function")
 			{
 				libAudio = el;
+				console.log("Found libaudio");
 			}
 			else if (typeof el["trigger"] == "function" 
 			       && typeof el["bind"] == "function"
@@ -110,6 +112,7 @@
 			       typeof el["broadcast"] == "function")
 			{
 				eventBus = el;
+				console.log("Found eventbus");
 			}
       	}     
 
@@ -124,12 +127,13 @@
         });
 
         eventBus.on('audio:play', function(sound) {
-        
+        console.log("Audio play", sound)
           updateSimplifyMetadata(simplify);
           simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PLAYING);
         });
 
         eventBus.on('audio:pause', function() {
+        	console.log("Audio pause");
           updateSimplifyMetadata(simplify);
           simplify.setNewPlaybackState(Simplify.PLAYBACK_STATE_PAUSED);
         });

@@ -1,68 +1,6 @@
 //Simplify Web client helper implementation.
 //Created by Semibold Mammoth in 2012.
 
-var ChromeProxyClient = null;
-
-if (typeof chrome !== "undefined")
-{
-	//WebSocket proxy object for Safari and Chrome
-	ChromeProxyClient = function(host)
-	{
-		this.host = host;
-		this.readyState = WebSocket.CLOSED;
-
-		//Storing self-reference
-		var _this = this;
-
-		/* Connecting to the proxy server */
-
-		this.port = chrome.runtime.connect("caopaadcaikafcghcgohcfjccglpbmdl", { name : "SimplifyProxyClient" });
-		this.port.postMessage({ name : "SIMPLIFY_PROXY_INIT", data : this.host });
-
-		this.port.onMessage.addListener(function(message)
-		{
-			if (message.name === "SIMPLIFY_PROXY_OPEN")
-			{
-				_this.readyState = WebSocket.OPEN;
-				_this.onopen(message.data);
-			}
-			else if (message.name == "SIMPLIFY_PROXY_CLOSE")
-			{
-				_this.readyState = WebSocket.CLOSED;
-				_this.onclose(message.data);
-				_this.port.disconnect();
-			}
-			else if (message.name == "SIMPLIFY_PROXY_ERROR")
-			{
-				_this.readyState = WebSocket.CLOSED;
-				_this.onerror(message.data);
-				_this.port.disconnect();
-			}
-			else if (message.name == "SIMPLIFY_PROXY_MESSAGE")
-			{
-				_this.onmessage(message.data);
-			}
-		});
-
-		/* Available proxy callbacks */
-
-		this.onopen = function() { }
-		this.onclose = function() { }
-		this.onerror = function() { }
-		this.onmessage = function() { }
-	}
-
-	ChromeProxyClient.prototype.send = function(dataString)
-	{
-		this.port.postMessage({ name : "SIMPLIFY_PROXY_NEW_MESSAGE", data : dataString });
-	}
-
-	ChromeProxyClient.prototype.close = function(code, reason)
-	{
-		this.port.postMessage({ name : "SIMPLIFY_PROXY_CLOSE" });
-	}
-}
-
 //Simplify constructor takes no arguments
 var Simplify = function()
 {
@@ -74,14 +12,7 @@ var Simplify = function()
 	//This methods looks for running instance of Simplify server and connects to it in case
 	var internal_connect = function()
 	{
-		if (typeof chrome !== "undefined")
-		{
-			connection = new ChromeProxyClient("ws://127.0.0.1:25984");
-		}
-		else
-		{
-			connection = new WebSocket("ws://127.0.0.1:25984/");
-		}
+		connection = new WebSocket("wss://localhost.tape.im:25984/");
 
 		//Stopping polling when connected
 		connection.onopen = function()
