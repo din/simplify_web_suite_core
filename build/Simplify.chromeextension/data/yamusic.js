@@ -1,111 +1,148 @@
 // Yandex.music
 // @hostname = music.yandex.ru
 
-if (window.top == window) {
-	window.addEventListener("load", function() {
-		//Creating Simplify object 
+if (window.top == window)
+{
+	//Setting up current player and listeners on page load
+	var setupSimpify = function() {
+		if (typeof externalAPI == "undefined") {
+			console.log("Waiting for audio player to be available...");
+			setTimeout(setupSimpify, 3000);
+			return;
+		}
+
+		//Creating Simplify object
 		var simplify = new Simplify();
-		//Setting up Yandex.Music description
+
+		//Extracting information about track from Vkontakte player
+		var get_current_track = function() {
+			if (typeof externalAPI == "undefined" ) return null;
+			return {	"author" : externalAPI.getCurrentTrack()["artists"][0].title,
+						"title"  : externalAPI.getCurrentTrack().title,
+						"album"  : externalAPI.getCurrentTrack()["album"].title,
+						"length" : parseInt(externalAPI.getProgress().duration),
+						"uri"	 : "http://music.yandex.ru" + externalAPI.getCurrentTrack().link,
+						"id"	 : externalAPI.getCurrentTrack().link
+					};
+		}
+
+		//Setting up Simplify player description
+		//This should be always done before any other actions
 		simplify.setCurrentPlayer("Yandex.Music");
 
-		interval = setInterval(function() {
-			var YaPlayer = Mu.pages.player;
-			if (YaPlayer) {
-				clearInterval(interval);
-				YaPlayer.states.on('setState:playing', function() {
-					simplify.setPlaybackPlaying();
-				});
-				YaPlayer.states.on('setState:paused', function() {
-					simplify.setPlaybackPaused();
-				});
-				YaPlayer.states.on('sendPlayInfo', function() {
-					window.lastTrackId == YaPlayer.currentTrackData.id ? simplify.setPlaybackPaused() : updateSimplifyMetadata(simplify)
-				});
-			}
-        }, 500);
+		//Hooking track switch inside Vkontakte
+		window.operateFirstCall = true, window.operateFirstCallChecker = null, window.lastTrackID = null;
 
-		window.lastTrackId = null;
 
-		updateSimplifyMetadata = function(simplify) {
-			var song = Mu.pages.player.currentTrackData;
-			if (Mu.pages.player.states._waiting === "undefined") {
-				console.log("Waiting for activation");
-				setTimeout(function() {
-					updateSimplifyMetadata(simplify);
-				}, 500);
-				return;
-			}
+		//Function to notify Simplify about changed track
+		var notify_simplify = function() {
+			//Extracting current track from audio player
+			var current_track = get_current_track();
+			if (current_track == null) return;
 
-			if (window.lastTrackId != song.id) {
-				simplify.setCurrentTrack({"author" : song.artists[0].name, 
-											"title" : song.title, 
-											"album" : typeof song.albums[0] !== "undefined" ? song.albums[0].title : null,
-											"length" : parseInt(Mu.pages.player.getDuration())});
-				simplify.setCurrentArtwork(typeof song.albums[0].coverUri !== "undefined" ? ('http://'+song.albums[0].coverUri.match('^.*/')+'m460x460') : null);
-				window.lastTrackId = song.id;
+			//If it exists and doesn't equal to the previous one, updating Simplify
+			if (current_track["id"] != window.lastTrackID)
+			{
+				//Sending various notifications
+				simplify.setCurrentTrack(current_track);
+				simplify.setCurrentArtwork("https://" + externalAPI.getCurrentTrack().cover.replace("%%", "400x400"));
+				if (externalAPI.isPlaying() == true) simplify.setPlaybackPlaying();
+
+				//Storing last track identifier
+				window.lastTrackID = current_track["id"];
 			}
-			return song;
 		};
 
-		//Pausing Simplify when Yandex.Music paused
-		var oldPause = Mu.pages.player.pause;
-		Mu.pages.player.pause = function() {
-			var result = oldPause.apply(this);
-			simplify.setPlaybackPaused();
-			return result;
-		}
-
-		//Restoring playback 
-		var oldPlay = Mu.pages.player.resume;
-		Mu.pages.player.resume = function(argument) {
-			var result = oldPlay.apply(this, argument);
-			simplify.setPlaybackPlaying();
-			return result;
-		}
-
-		// Stop Simplify after clearing Yandex.Music queue
-		var oldStop = Mu.pages.player.stop;
-		Mu.pages.player.stop = function() {
-			var result = oldStop.apply(this);
-			if (Mu.pages.player.flow.getNavigation().next !== true) {
-				// console.log("Player has been stopped");
-				simplify.setPlaybackStopped();
+		var updatingSimplify = function() {
+			if (typeof externalAPI.getProgress().duration == "number") {
+				notify_simplify();
 			}
-			return result;
+			else {
+				setTimeout(updatingSimplify, 500);
+				return;
+			}
+		};
+
+		externalAPI.on("track", function() {
+			updatingSimplify();
+		});
+
+		externalAPI.on("state", function() {
+			if (externalAPI.isPlaying() == false) {
+				simplify.setPlaybackPaused();
+			}
+			else {
+				simplify.setPlaybackPlaying();
+			}
+		});
+
+		//Not a first call? Simply notifying
+		if (window.operateFirstCall == false) {
+			notify_simplify();
+		}
+		else {
+			//First time player creation.
+			operateFirstCallChecker = setInterval(function() {
+				if(typeof externalAPI.getProgress().duration == "number") {
+					clearInterval(operateFirstCallChecker);
+					updatingSimplify();
+				}
+			}, 500);
+			window.operateFirstCall = false;
 		}
 
-		//Handling incoming events
-		simplify.bindToVolumeRequest(function() {
-			if (typeof Mu.pages.player.currentTrackData == "undefined") return 0;
-			return parseInt(Mu.pages.player.getVolume()*100);
-		}).bindToTrackPositionRequest(function() {
-			if (typeof Mu.pages.player.currentTrackData == "undefined") return 0;
-			return parseInt(Mu.pages.player.getPosition());
-		}).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
-			if (typeof Mu.pages.player.currentTrackData == "undefined") return;
-			Mu.pages.player.flow.prev();
-			// Emulate default action of Yandex.Music after rewinding
-			simplify.setPlaybackPlaying();
-		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
-			if (typeof Mu.pages.player.currentTrackData == "undefined") return;
-			Mu.pages.player.flow.next();
-			// Emulate default action of Yandex.Music after fast forwarding
-			simplify.setPlaybackPlaying();
-		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data) {
-			if (typeof Mu.pages.player.currentTrackData == "undefined") return;	
-			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) Mu.pages.player.resume();
-			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) Mu.pages.player.pause();
-		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data) {
-			if (data["amount"] == null || typeof Mu.pages.player.currentTrackData == "undefined") return;
-			Mu.pages.player.setVolume(data["amount"]/100);
-		}).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
-			if (data["amount"] == null || typeof Mu.pages.player.currentTrackData == "undefined") return;
-			Mu.pages.player.setPosition(parseFloat(data["amount"]));
+
+		// Handling basic events from Simplify server
+		simplify.bindToVolumeRequest(function()
+		{
+			if (typeof externalAPI == "undefined") return 0;
+			return externalAPI.getVolume()*100;
+
+		}).bindToTrackPositionRequest(function()
+		{
+
+			if (typeof externalAPI.getProgress().position != "number") return 0;
+			return parseInt(externalAPI.getProgress().position);
+
+		}).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function()
+		{
+
+			if (typeof externalAPI == "undefined") return;
+			externalAPI.prev();
+
+		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function()
+		{
+
+			if (typeof externalAPI == "undefined") return;
+			externalAPI.next();
+
+		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
+		{
+
+			if (data["state"] == null || typeof externalAPI == "undefined") return;
+			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) externalAPI.togglePause(true);
+			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) externalAPI.togglePause(false);
+
+		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data)
+		{
+
+			if (data["amount"] == null || typeof externalAPI == "undefined") return;
+			externalAPI.setVolume(data["amount"]/100);
+
+		}).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data)
+		{
+
+			if (data["amount"] == null || typeof externalAPI == "undefined") return;
+			externalAPI.setPosition(parseFloat(data["amount"]));
+
 		});
 
 		//Subscribing to unload event to clear our player
-		window.addEventListener("unload", function() {
+		window.addEventListener("unload", function()
+		{
 			simplify.closeCurrentPlayer();
 		});
-	});
+	};
+
+	window.addEventListener("load", setupSimpify);
 }
