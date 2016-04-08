@@ -7,12 +7,12 @@ module.exports = {
 
 		chrome : {
 			name : "Simplify.chromeextension",
-			version : "1.6.0",
+			version : "1.7.0",
 		},
 
 		safari : {
 			name : "Simplify.safariextension",
-			version : "1.6.0",
+			version : "1.7.0",
 		}
 
 	},
@@ -20,7 +20,7 @@ module.exports = {
 	//Output build directory
 	buildDir : "./build",
 
-	//Players directory contains all the players 
+	//Players directory contains all the players
 	playersDir : "./players",
 
 	//Skeleton directory
