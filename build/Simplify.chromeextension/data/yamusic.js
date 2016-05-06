@@ -20,7 +20,7 @@ if (window.top == window)
 			return {	"author" : externalAPI.getCurrentTrack()["artists"][0].title,
 						"title"  : externalAPI.getCurrentTrack().title,
 						"album"  : externalAPI.getCurrentTrack()["album"].title,
-						"length" : parseInt(externalAPI.getProgress().duration),
+						"length" : parseInt(externalAPI.getCurrentTrack().duration),
 						"uri"	 : "http://music.yandex.ru" + externalAPI.getCurrentTrack().link,
 						"id"	 : externalAPI.getCurrentTrack().link
 					};
@@ -120,8 +120,8 @@ if (window.top == window)
 		{
 
 			if (data["state"] == null || typeof externalAPI == "undefined") return;
-			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) externalAPI.togglePause(true);
-			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) externalAPI.togglePause(false);
+			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) externalAPI.togglePause();
+			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) externalAPI.togglePause();
 
 		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data)
 		{
