@@ -1,10 +1,10 @@
-{ 
+{
 	"name" : "Simplify",
-	"version" : "1.7.0",
+	"version" : "1.7.2",
 	"manifest_version" : 2,
 	"description" : "Simplify for web players: Pandora, Deezer, Vk, SoundCloud, and 8tracks",
 	"key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCWrsCJfjrIEWmYPr1anYvMS2reWFfFDvJLk06xunLYkRF9q0xhXft2rb9aTdKFE6+qKG4V/5V6ZhkVgRV+lsSQ73fQRG+27nAK0ytw/K2QryjfxI4x0HJVtVeKVrJFahlB0iucPzaW6WxFF3h+yQHC93xUmR2eAbWLIG9Cc8FL9wIDAQAB",
-	
+
 	"content_scripts" : [
 		{
 			"run_at"  : "document_end",
@@ -12,6 +12,12 @@
 			"js" 		 : ["extensions.js"]
 		}
 	],
+
+	"icons": {
+		"16": "icon/icon16.png",
+		"48": "icon/icon48.png",
+		"128": "icon/icon128.png"
+	},
 
 	"externally_connectable": {
 
@@ -31,7 +37,7 @@
   		]
 	},
 
-	"web_accessible_resources" : ["data/simplify.js", 
+	"web_accessible_resources" : ["data/simplify.js",
 								  "data/8tracks.js", 
 "data/deezer.js", 
 "data/google-music.js", 
@@ -40,9 +46,6 @@
 "data/podwrangler.js", 
 "data/soundcloud.js", 
 "data/vk.js", 
-"data/yamusic.js"							
+"data/yamusic.js"
 								]
 }
-
-
-
