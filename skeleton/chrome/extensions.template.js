@@ -10,7 +10,7 @@ var scripts = {
 };
 
 //Checking if current site is listed
-if (scripts[location.host.replace("www.", "")] != null)
+if (scripts[location.hostname.replace("www.", "")] != null)
 {
 	//Core API injection
 	var core = document.createElement("script");
