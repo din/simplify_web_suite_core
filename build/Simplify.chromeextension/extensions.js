@@ -9,6 +9,7 @@ var scripts = {
 "plex.tv" : "data/plex.js", 
 "localhost" : "data/plex.js", 
 "127.0.0.1" : "data/plex.js", 
+"play.pocketcasts.com" : "data/pocketcasts.js", 
 "feedwrangler.net" : "data/podwrangler.js", 
 "soundcloud.com" : "data/soundcloud.js", 
 "vk.com" : "data/vk.js", 
@@ -16,7 +17,7 @@ var scripts = {
 };
 
 //Checking if current site is listed
-if (scripts[location.host.replace("www.", "")] != null)
+if (scripts[location.hostname.replace("www.", "")] != null)
 {
 	//Core API injection
 	var core = document.createElement("script");
