@@ -21,10 +21,10 @@
   var updateSimplifyMetadata = function(simplify, checkLast) {
     var playhead = readSlider($("#material-player-progress"));
 
-    var title = $("#player-song-title").text();
+    var title = $("#currently-playing-title").text();
     var album = $(".player-album").text();
     var artist = $("#player-artist").text();
-    var albumArt = $("#playingAlbumArt");
+    var albumArt = $("#playerBarArt");
     if(albumArt[0]) {
       albumArt = albumArt[0].src.replace('=s90-c-e','=s1000-c-e');
     }
@@ -68,11 +68,11 @@
         var playhead = readSlider($("#material-player-progress"));
         return playhead.current / 1000;
       }).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
-        $("sj-icon-button[data-id=forward]").click();
+        $("paper-icon-button[data-id=forward]").click();
       }).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
-        $("sj-icon-button[data-id=rewind]").click();
+        $("paper-icon-button[data-id=rewind]").click();
       }).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function() {
-        $("sj-icon-button[data-id=play-pause]").click();
+        $("paper-icon-button[data-id=play-pause]").click();
       });
 
       window.addEventListener('unload', function() {
