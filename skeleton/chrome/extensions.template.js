@@ -3,16 +3,16 @@
 (function () {
 
 //All supported sites are listed here
-var scriptURL = ({
-	<%- _.map(data.hosts, function(value, key) 
-		{ 
-			return util.format('"%s" : "%s"', key, path.join(data.dataDir, path.basename(value))); 
+var scripts = {
+	<%- _.map(data.hosts, function(value, key)
+		{
+			return util.format('"%s" : "%s"', key, path.join(data.dataDir, path.basename(value)));
 		}).join(", \n")
 	%>
-})[location.hostname.replace(/^www\./, "")];
+};
 
 //Checking if current site is listed
-if (scriptURL)
+if (scripts[location.hostname.replace("www.", "")] != null)
 {
 	//Core API injection
 	var core = document.createElement("script");
@@ -21,8 +21,8 @@ if (scriptURL)
 
 	//Particular script injection
 	var script = document.createElement("script");
-	script.src = chrome.extension.getURL(scriptURL);
-	(document.head || document.documentElement).appendChild(location.host.replace(/^www\./, ""));
+	script.src = chrome.extension.getURL(scripts[location.host.replace("www.", "")]);
+	(document.head || document.documentElement).appendChild(script);
 }
 
 }());
