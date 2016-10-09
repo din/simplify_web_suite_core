@@ -1,155 +1,93 @@
 // Vkontakte
 // @hostname = vk.com
 
-if (window.top == window)
-{
-	//Setting up current player and listeners on page load
-	var setupSimpify = function()
-	{
-		if (typeof audioPlayer == "undefined")
-		{
-			console.log("Waiting for audio player to be available...");
-			setTimeout(setupSimpify, 3000);
-			return;
-		}
+if (window.top == window) {
+  //Setting up current player and listeners on page load
+  var setupSimpify = function()
+  {
+    if (typeof getAudioPlayer !== "function") {
+      console.log("Waiting for audio player to be available...");
+      setTimeout(setupSimpify, 3000);
+      return;
+    }
 
-		//Creating Simplify object 
-		var simplify = new Simplify();
+    var player = getAudioPlayer();
+    var current_track;
 
-		//Extracting information about track from Vkontakte player
-		var get_current_track = function()
-		{
-			if (typeof audioPlayer == "undefined" || audioPlayer == null) return null;
-			return {"author" : audioPlayer.lastSong["5"], 
-					  "title"  : audioPlayer.lastSong["6"],
-					  "album"  : " ",
-					  "length" : parseInt(audioPlayer.lastSong["3"]),
-					  "uri"	  : "http://vk.com/search?" + ("c[section]=audio&c[q]=" + 
-					  																			audioPlayer.lastSong["5"] + " - " +
-					  																			audioPlayer.lastSong["6"]),
-					  "id"	  : audioPlayer.lastSong["1"]};
-		}
+    //Creating Simplify object
+    var simplify = new Simplify();
 
-		//Setting up Simplify player description 
-		//This should be always done before any other actions
-		simplify.setCurrentPlayer("Vkontakte");
-		
-		//Hooking track switch inside Vkontakte
-		var oldOperate = audioPlayer.operate;
-		window.operateFirstCall = true, window.operateFirstCallChecker = null, window.lastTrackID = null;
-		audioPlayer.operate = function()
-		{
-			var result = oldOperate.apply(this, arguments);
-			
-			//Function to notify Simplify about changed track
-			var notify_simplify = function()
-			{
-				//Extracting current track from audio player
-				var current_track = get_current_track();
-				if (current_track == null) return;
+    //Setting up Simplify player description
+    //This should be always done before any other actions
+    simplify.setCurrentPlayer("VK");
 
-				//If it exists and doesn't equal to the previous one, updating Simplify
-				if (current_track["id"] != window.lastTrackID)
-				{
-					//Sending various notifications
-					//No artwork can be extracted from Vkontakte, Simplify will find it by itself
-					simplify.setCurrentTrack(current_track);
-					simplify.setCurrentArtwork(null);
-					if (audioPlayer.player.paused() == false) simplify.setPlaybackPlaying();
+    listenForPlayerEvents();
 
-					//Storing last track identifier
-					window.lastTrackID = current_track["id"];
-				}
-				else
-				{
-					//Player state change
-					if (audioPlayer.player != null && audioPlayer.player.paused() == true)
-					{
-						simplify.setPlaybackPaused();
-					}
-					else
-					{
-						simplify.setPlaybackPlaying();
-					}
-				}
-			}
+    function listenForPlayerEvents() {
+      player.on(player, "start", handlePlay);
+      player.on(player, "pause", handlePause);
+      player.on(player, "start_load", handleUpdate);
+    }
 
-			//Not a first call? Simply notifying
-			if (window.operateFirstCall == false)
-			{
-				notify_simplify();
-			}
-			else
-			{
-				//First time player creation.
-				operateFirstCallChecker = setInterval(function() 
-				{  
-					if(audioPlayer.lastSong != null)
-					{
-						clearInterval(operateFirstCallChecker);
-						notify_simplify();
-					}
-				}, 500);
+    function handlePlay() {
+      simplify.setPlaybackPlaying();
+    }
 
-				window.operateFirstCall = false;
-			}
+    function handlePause() {
+      simplify.setPlaybackPaused();
+    }
 
-			return result;
-		}
+    function handleUpdate(song, eventData) {
+      current_track = {
+        "author"  : song[4],
+        "title"   : song[3],
+        "album"   : " ",
+        "length"  : parseInt(song[5]),
+        "uri"     : "https://vk.com/audio?q=" + song[4] + " - " + song[3],
+        "id"      : song[0]
+      };
+      simplify.setCurrentTrack(current_track);
+      simplify.setCurrentArtwork(null);
+    }
 
-		//Handling basic events from Simplify server
-		simplify.bindToVolumeRequest(function()
-		{
+    //Handling basic events from Simplify server
+    simplify.bindToVolumeRequest(function() {
+      if (typeof getAudioPlayer == "undefined") {
+        return 0
+      };
+      return player.getVolume()*100;
+    })
+    .bindToTrackPositionRequest(function() {
+      if (typeof getAudioPlayer == "undefined" || getAudioPlayer == null) return 0;
+      return parseInt(player.getCurrentProgress() * current_track.length);
+    })
+    .bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function() {
+      if (typeof getAudioPlayer == "undefined") return;
+      player.playPrev();
+    })
+    .bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function() {
+      if (typeof getAudioPlayer == "undefined") return;
+      player.playNext();
+    })
+    .bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data) {
+      if (data["state"] == null || typeof getAudioPlayer == "undefined") return;
+      if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) player.play();
+      if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) player.pause();
+    })
+    .bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data) {
+      if (data["amount"] == null || typeof getAudioPlayer == "undefined") return;
+      player.setVolume(data["amount"]/100);
+    })
+    .bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data) {
+      if (data["amount"] == null || typeof getAudioPlayer == "undefined") return;
+      player.seek(parseFloat(data["amount"] / current_track.length))
+    });
 
-			if (typeof audioPlayer == "undefined" || audioPlayer.player == null) return 0;
-			return audioPlayer.player.getVolume()*100;
-
-		}).bindToTrackPositionRequest(function()
-		{
-
-			if (typeof audioPlayer == "undefined" || audioPlayer.player == null) return 0;
-			return parseInt(audioPlayer.player.music.currentTime);
-
-		}).bind(Simplify.MESSAGE_DID_SELECT_PREVIOUS_TRACK, function()
-		{
-
-			if (typeof audioPlayer == "undefined") return;
-			audioPlayer.prevTrack();
-
-		}).bind(Simplify.MESSAGE_DID_SELECT_NEXT_TRACK, function()
-		{
-
-			if (typeof audioPlayer == "undefined") return;
-			audioPlayer.nextTrack();
-		
-		}).bind(Simplify.MESSAGE_DID_CHANGE_PLAYBACK_STATE, function(data)
-		{
-
-			if (data["state"] == null || typeof audioPlayer == "undefined") return;	
-			if (data["state"] == Simplify.PLAYBACK_STATE_PLAYING) audioPlayer.playTrack();
-			if (data["state"] == Simplify.PLAYBACK_STATE_PAUSED) audioPlayer.pauseTrack();
-		
-		}).bind(Simplify.MESSAGE_DID_CHANGE_VOLUME, function(data)
-		{
-
-			if (data["amount"] == null || typeof audioPlayer == "undefined" || typeof audioPlayer.player == "undefined") return;
-			audioPlayer.player.setVolume(data["amount"]/100);
-			setStyle(audioPlayer.controls.ac.volume, {"width" : (data["amount"]) + "%"});
-
-		}).bind(Simplify.MESSAGE_DID_CHANGE_TRACK_POSITION, function(data)
-		{
-
-			if (data["amount"] == null || typeof audioPlayer == "undefined" || typeof audioPlayer.player == "undefined") return;
-			audioPlayer.player.music.currentTime = parseFloat(data["amount"]);
-
-		});
-
-		//Subscribing to unload event to clear our player
-		window.addEventListener("unload", function()
-		{
-			simplify.closeCurrentPlayer();
-		}); 
-	};
-
-	window.addEventListener("load", setupSimpify);
+    //Subscribing to unload event to clear our player
+    window.addEventListener("unload", function()
+    {
+      simplify.closeCurrentPlayer();
+    });
+  };
+  window.addEventListener("load", setupSimpify);
 }

@@ -7,12 +7,12 @@ module.exports = {
 
 		chrome : {
 			name : "Simplify.chromeextension",
-			version : "1.7.2",
+			version : "1.7.3",
 		},
 
 		safari : {
 			name : "Simplify.safariextension",
-			version : "1.7.2",
+			version : "1.7.3",
 		}
 
 	},
